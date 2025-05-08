@@ -10,6 +10,7 @@ import { ReviewStep } from './review-step';
 import { SuccessStep } from './success-step';
 import { useToast } from '@/hooks/use-toast';
 import { useSaveFormProgress } from '@/hooks/use-save-form-progress';
+import { insertFormData } from '@/lib/supabase';
 
 const initialFormData: FormData = {
   personalInfo: {
@@ -66,13 +67,16 @@ export function FormContainer() {
   }, [formData, step, saveProgress]);
 
   const updateFormData = (fieldName: string, value: any, section: keyof FormData) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [fieldName]: value,
-      },
-    }));
+    setFormData((prev) => {
+      const sectionData = prev[section] || {};
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [fieldName]: value,
+        },
+      };
+    });
   };
 
   const goToNextStep = () => {
@@ -91,15 +95,15 @@ export function FormContainer() {
 
   const handleSubmit = async () => {
     try {
-      // In a real implementation, this would submit the form data to the server
-      console.log('Form submitted:', formData);
-      
+      // Insert form data into Supabase
+      await insertFormData('form_data', formData);
+
       // Move to success step
       goToNextStep();
-      
+
       // Clear local storage after successful submission
       localStorage.removeItem('saaryFormData');
-      
+
       toast({
         title: "Form Submitted Successfully",
         description: "Your application has been submitted for background verification.",
