@@ -8,6 +8,7 @@ import { DocumentUploadStep } from './document-upload-step';
 import { ConsentStep } from './consent-step';
 import { ReviewStep } from './review-step';
 import { SuccessStep } from './success-step';
+import { PaymentStep } from './payment-step';
 import { useToast } from '@/hooks/use-toast';
 import { useSaveFormProgress } from '@/hooks/use-save-form-progress';
 import { supabase } from '@/lib/supabase';
@@ -32,6 +33,10 @@ const initialFormData: FormData = {
   consentInfo: {
     consentGiven: false,
     consentDate: undefined,
+  },
+  paymentInfo: {
+    paymentMethod: '',
+    paymentStatus: '',
   },
   formProgress: 0,
 };
@@ -75,9 +80,8 @@ export function FormContainer() {
     }));
   };
 
-
   const goToNextStep = () => {
-    if (step < 5) {
+    if (step < 6) {
       setStep((prevStep) => prevStep + 1);
       window.scrollTo(0, 0);
     }
@@ -127,6 +131,8 @@ export function FormContainer() {
       const insurance = await processDocument('insurance', formData.documentInfo.insurance);
 
       // Prepare submission data matching your schema
+      const paymentInfo = formData.paymentInfo || { paymentMethod: '', paymentStatus: '' };
+
       const submissionData = {
         first_name: formData.personalInfo.firstName,
         second_name: formData.personalInfo.secondName,
@@ -154,6 +160,8 @@ export function FormContainer() {
         insurance_storage_path: insurance?.storage_path || null,
         consent_given: formData.consentInfo.consentGiven,
         consent_date: formData.consentInfo.consentDate || new Date().toISOString(),
+        payment_phone_number: paymentInfo.phoneNumber || null,
+        payment_transaction_code: paymentInfo.transactionCode || null,
       };
 
       // Insert into database
@@ -213,15 +221,22 @@ export function FormContainer() {
       )}
 
       {step === 4 && (
+        <PaymentStep
+          onNext={goToNextStep}
+          onPrevious={goToPreviousStep}
+          updateFormData={(field, value) => updateFormData(field, value, 'paymentInfo')}
+        />
+      )}
+
+      {step === 5 && (
         <ReviewStep
           formData={formData}
           onSubmit={handleSubmit}
           onPrevious={goToPreviousStep}
-          
         />
       )}
 
-      {step === 5 && <SuccessStep />}
+      {step === 6 && <SuccessStep />}
     </div>
   );
 }

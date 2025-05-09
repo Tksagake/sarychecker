@@ -29,10 +29,18 @@ export type ConsentInfo = {
   consentDate?: Date;
 };
 
+export type PaymentInfo = {
+  paymentMethod: string;
+  paymentStatus?: string;
+  phoneNumber?: string;
+  transactionCode?: string;
+};
+
 export type FormData = {
   personalInfo: PersonalInfo;
   documentInfo: DocumentInfo;
   consentInfo: ConsentInfo;
+  paymentInfo?: PaymentInfo;
   userId?: string;
   applicationId?: string;
   formProgress?: number;
