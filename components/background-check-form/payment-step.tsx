@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { SectionHeader } from './section-header';
+
+const paymentSchema = z.object({
+  phoneNumber: z.string().min(10, { message: 'Phone number is required' }),
+  transactionCode: z.string().min(5, { message: 'Transaction code is required' }),
+});
 
 interface PaymentStepProps {
   onNext: () => void;
@@ -10,22 +22,20 @@ interface PaymentStepProps {
 }
 
 export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepProps) {
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [transactionCode, setTransactionCode] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handlePayment = async () => {
-    if (!phoneNumber || !transactionCode) {
-      alert('Please enter both the phone number and transaction code.');
-      return;
-    }
+  const form = useForm<z.infer<typeof paymentSchema>>({
+    resolver: zodResolver(paymentSchema),
+    defaultValues: {
+      phoneNumber: '',
+      transactionCode: '',
+    },
+  });
 
+  const onSubmit = async (values: z.infer<typeof paymentSchema>) => {
     setIsProcessing(true);
-
-    // Simulate payment processing
     setTimeout(() => {
-      updateFormData('paymentInfo', { phoneNumber, transactionCode }, 'paymentInfo');
+      updateFormData('paymentInfo', values, 'paymentInfo');
       setIsProcessing(false);
       onNext();
     }, 2000);
@@ -39,45 +49,53 @@ export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepP
           description="Please complete your payment using the details below and provide the required information."
         />
 
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm font-medium">Mpesa Paybill: <strong>918059</strong></p>
-            <p className="text-sm font-medium">Account: <strong>ID Number</strong></p>
-            <p className="text-sm font-medium">Amount (KES): <strong>1,650.00</strong></p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Phone Number Used for Payment</label>
-            <input
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-              placeholder="Enter phone number"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Transaction Code</label>
-            <input
-              type="text"
-              value={transactionCode}
-              onChange={(e) => setTransactionCode(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-              placeholder="Enter transaction code"
-            />
-          </div>
+        <div className="mb-6 space-y-1 text-sm font-medium">
+          <p>Mpesa Paybill: <strong>918059</strong></p>
+          <p>Account: <strong>ID Number</strong></p>
+          <p>Amount (KES): <strong>1,650.00</strong></p>
         </div>
-      </CardContent>
 
-      <CardFooter className="flex justify-between pt-6">
-        <Button onClick={onPrevious} disabled={isProcessing}>
-          Previous
-        </Button>
-        <Button onClick={handlePayment} >
-          Proceed to Review
-        </Button>
-      </CardFooter>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number Used for Payment</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. 0712345678" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="transactionCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Transaction Code</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. QWERTY1234" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-between pt-4">
+              <Button type="button" onClick={onPrevious} disabled={isProcessing}>
+                Previous
+              </Button>
+              <Button type="submit" disabled={isProcessing}>
+                {isProcessing ? 'Processing...' : 'Proceed to Review'}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   );
 }
