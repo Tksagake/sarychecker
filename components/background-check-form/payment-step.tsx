@@ -76,9 +76,9 @@ export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepP
               name="transactionCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Transaction Code</FormLabel>
+                  <FormLabel>Transaction Message</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. QWERTY1234" {...field} />
+                    <Input placeholder="e.g. TBQ5LL3N Confirmed. Ksh..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
