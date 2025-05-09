@@ -10,7 +10,7 @@ export default function Home() {
           <div className="container max-w-4xl">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">Background Check Application</h1>
             <p className="text-primary-foreground/80 max-w-2xl">
-              Complete this form to submit your details for background verification by Saary Network International. 
+              Complete this form to submit your details for background verification by Sary Network International. 
               You can save your progress and return to complete it later.
             </p>
           </div>
@@ -21,7 +21,7 @@ export default function Home() {
       
       <footer className="border-t py-6 bg-background">
         <div className="container max-w-4xl text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Saary Network International. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Sary Network International. All rights reserved.</p>
         </div>
       </footer>
     </div>

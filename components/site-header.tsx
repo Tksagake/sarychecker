@@ -11,9 +11,9 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center space-x-2">
           <BuildingIcon className="h-6 w-6 text-primary" />
           <span className="hidden font-bold sm:inline-block">
-            Saary Network International
+            Sary Network International
           </span>
-          <span className="inline-block font-bold sm:hidden">Saary</span>
+          <span className="inline-block font-bold sm:hidden">Sary</span>
         </Link>
         <MainNav className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">

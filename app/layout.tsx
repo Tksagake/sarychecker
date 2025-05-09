@@ -15,6 +15,10 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Sary Network International - Background Check',
   description: 'Submit your details for background verification by Sary Network International',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+  },
 };
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {

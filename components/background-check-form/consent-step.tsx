@@ -58,12 +58,12 @@ export function ConsentStep({
             <h3 className="text-lg font-medium mb-4">Privacy Policy and Terms</h3>
             <div className="space-y-4 text-sm">
               <p>
-                Saary Network International is committed to protecting your privacy and ensuring
+                Sary Network International is committed to protecting your privacy and ensuring
                 the security of your personal information. The information collected will be used
                 solely for the purpose of conducting a background verification check.
               </p>
               <p>
-                By providing consent, you authorize Saary Network International to:
+                By providing consent, you authorize Sary Network International to:
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>Verify your employment history, educational qualifications, and credentials.</li>
@@ -94,7 +94,7 @@ export function ConsentStep({
                 Consent Agreement
               </label>
               <p className="text-sm text-muted-foreground">
-                I, the undersigned, hereby authorize Saary Network International to obtain a
+                I, the undersigned, hereby authorize Sary Network International to obtain a
                 background screening report on me in order to verify my provided details for
                 the purpose of my application/employment. I confirm that I have read and understood
                 the Company's Data Privacy and Privacy Policy. I give my consent to share my personal
