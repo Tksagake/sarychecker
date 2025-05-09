@@ -7,17 +7,20 @@ import { UserNav } from './user-nav';
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-center">
+      <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
             alt="Sary Logo"
             width={40}
             height={40}
-            className="h-8 w-8 rounded-full"
+            className="h-16 w-8"
           />
-          <UserNav/>
+          
+
         </Link>
+        <ModeToggle/>
+          <UserNav/>
       </div>
     </header>
   );
