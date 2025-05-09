@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { MainNav } from '@/components/main-nav';
 import { ModeToggle } from '@/components/mode-toggle';
 import Image from 'next/image';
+import { UserNav } from './user-nav';
 
 export function SiteHeader() {
   return (
@@ -15,6 +16,7 @@ export function SiteHeader() {
             height={40}
             className="h-8 w-8 rounded-full"
           />
+          <UserNav/>
         </Link>
       </div>
     </header>
