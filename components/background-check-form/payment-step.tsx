@@ -50,7 +50,7 @@ export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepP
         />
 
         <div className="mb-6 space-y-1 text-sm font-medium">
-          <p>Mpesa Paybill: <strong>918059</strong></p>
+          <p>Mpesa Paybill: <strong>918059</strong> <em>(Sary Network International Ltd)</em> </p>
           <p>Account: <strong>ID Number</strong></p>
           <p>Amount (KES): <strong>1,650.00</strong></p>
         </div>
