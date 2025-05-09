@@ -74,7 +74,7 @@ export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepP
         <Button onClick={onPrevious} disabled={isProcessing}>
           Previous
         </Button>
-        <Button onClick={handlePayment} isLoading={isProcessing}>
+        <Button onClick={handlePayment} >
           Proceed to Review
         </Button>
       </CardFooter>
