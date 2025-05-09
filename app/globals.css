@@ -1,3 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 10, 20, 30; /* dark navy text for better readability */
+  --background-start-rgb: 240, 248, 255; /* light blue */
+  --background-end-rgb: 255, 255, 255; /* white */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 230, 240, 255;
+    --background-start-rgb: 10, 20, 40; /* dark blue */
+    --background-end-rgb: 5, 10, 20; /* deeper dark blue */
+  }
+}
+
 @layer base {
   :root {
     --background: 210 40% 98%; /* #F8FAFC */
@@ -31,5 +49,14 @@
     --border: 215 28% 20%;
     --input: 215 28% 20%;
     --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
