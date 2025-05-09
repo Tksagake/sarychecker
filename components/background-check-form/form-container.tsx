@@ -10,7 +10,7 @@ import { ReviewStep } from './review-step';
 import { SuccessStep } from './success-step';
 import { useToast } from '@/hooks/use-toast';
 import { useSaveFormProgress } from '@/hooks/use-save-form-progress';
-import { insertFormData } from '@/lib/supabase';
+import { insertFormData, supabase } from '@/lib/supabase';
 
 const initialFormData: FormData = {
   personalInfo: {
@@ -31,6 +31,7 @@ const initialFormData: FormData = {
   },
   consentInfo: {
     consentGiven: false,
+    consentDate: undefined,
   },
   formProgress: 0,
 };
@@ -41,12 +42,10 @@ export function FormContainer() {
   const { toast } = useToast();
   const { saveProgress, loadProgress } = useSaveFormProgress();
 
-  // Load saved progress on initial render
   useEffect(() => {
     const savedData = loadProgress();
     if (savedData) {
       setFormData(savedData);
-      // Set the step based on the saved progress
       if (savedData.formProgress) {
         setStep(savedData.formProgress);
       }
@@ -57,7 +56,6 @@ export function FormContainer() {
     }
   }, [loadProgress, toast]);
 
-  // Save progress whenever form data changes
   useEffect(() => {
     const timer = setTimeout(() => {
       saveProgress({ ...formData, formProgress: step });
@@ -95,24 +93,82 @@ export function FormContainer() {
 
   const handleSubmit = async () => {
     try {
-      // Insert form data into Supabase
-      await insertFormData('form_data', formData);
+      if (!formData.personalInfo || !formData.documentInfo || !formData.consentInfo) {
+        throw new Error('Invalid form data structure');
+      }
 
-      // Move to success step
+      const documentMetadata = Object.entries(formData.documentInfo).flatMap(([type, files]) => {
+        if (!files) return [];
+        return (files as File[]).map((file) => ({
+          type,
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+          storage_path: `submissions/${file.name}`,
+          file,
+        }));
+      });
+
+      for (const doc of documentMetadata) {
+        const { error: uploadError } = await supabase.storage
+          .from('submissions')
+          .upload(doc.storage_path, doc.file, {
+            cacheControl: '3600',
+            upsert: true,
+          });
+        if (uploadError) {
+          console.error(`Failed to upload file: ${doc.file_name}`, uploadError);
+          throw new Error(`Failed to upload file: ${doc.file_name}`);
+        }
+      }
+
+      const submissionData = {
+        first_name: formData.personalInfo.firstName,
+        second_name: formData.personalInfo.secondName,
+        phone: formData.personalInfo.phone,
+        email: formData.personalInfo.email,
+        id_number: formData.personalInfo.idNumber,
+        country: formData.personalInfo.country,
+        county: formData.personalInfo.county,
+        physical_address: formData.personalInfo.physicalAddress,
+        good_conduct_file_name: documentMetadata.find(doc => doc.type === 'goodConduct')?.file_name,
+        good_conduct_file_size: documentMetadata.find(doc => doc.type === 'goodConduct')?.file_size,
+        good_conduct_file_type: documentMetadata.find(doc => doc.type === 'goodConduct')?.file_type,
+        good_conduct_storage_path: documentMetadata.find(doc => doc.type === 'goodConduct')?.storage_path,
+        drivers_license_file_name: documentMetadata.find(doc => doc.type === 'driversLicense')?.file_name,
+        drivers_license_file_size: documentMetadata.find(doc => doc.type === 'driversLicense')?.file_size,
+        drivers_license_file_type: documentMetadata.find(doc => doc.type === 'driversLicense')?.file_type,
+        drivers_license_storage_path: documentMetadata.find(doc => doc.type === 'driversLicense')?.storage_path,
+        log_book_file_name: documentMetadata.find(doc => doc.type === 'logBook')?.file_name,
+        log_book_file_size: documentMetadata.find(doc => doc.type === 'logBook')?.file_size,
+        log_book_file_type: documentMetadata.find(doc => doc.type === 'logBook')?.file_type,
+        log_book_storage_path: documentMetadata.find(doc => doc.type === 'logBook')?.storage_path,
+        insurance_file_name: documentMetadata.find(doc => doc.type === 'insurance')?.file_name,
+        insurance_file_size: documentMetadata.find(doc => doc.type === 'insurance')?.file_size,
+        insurance_file_type: documentMetadata.find(doc => doc.type === 'insurance')?.file_type,
+        insurance_storage_path: documentMetadata.find(doc => doc.type === 'insurance')?.storage_path,
+        consent_given: formData.consentInfo.consentGiven,
+        consent_date: formData.consentInfo.consentDate,
+      };
+
+      const { error } = await supabase.from('form_submissions').insert(submissionData);
+      if (error) {
+        throw new Error('Failed to insert submission data');
+      }
+
       goToNextStep();
-
-      // Clear local storage after successful submission
       localStorage.removeItem('saaryFormData');
 
       toast({
-        title: "Form Submitted Successfully",
-        description: "Your application has been submitted for background verification.",
+        title: 'Form Submitted Successfully',
+        description: 'Your application has been submitted for background verification.',
       });
     } catch (error) {
+      console.error('Error during submission:', error);
       toast({
-        variant: "destructive",
-        title: "Submission Failed",
-        description: "There was an error submitting your form. Please try again.",
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: 'There was an error submitting your form. Please try again.',
       });
     }
   };
@@ -120,41 +176,41 @@ export function FormContainer() {
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <FormProgress currentStep={step} />
-      
+
       {step === 1 && (
-        <PersonalInfoStep 
-          formData={formData.personalInfo} 
+        <PersonalInfoStep
+          formData={formData.personalInfo}
           updateFormData={(field, value) => updateFormData(field, value, 'personalInfo')}
           onNext={goToNextStep}
         />
       )}
-      
+
       {step === 2 && (
-        <DocumentUploadStep 
+        <DocumentUploadStep
           formData={formData.documentInfo}
           updateFormData={(field, value) => updateFormData(field, value, 'documentInfo')}
           onNext={goToNextStep}
           onPrevious={goToPreviousStep}
         />
       )}
-      
+
       {step === 3 && (
-        <ConsentStep 
+        <ConsentStep
           formData={formData.consentInfo}
           updateFormData={(field, value) => updateFormData(field, value, 'consentInfo')}
           onNext={goToNextStep}
           onPrevious={goToPreviousStep}
         />
       )}
-      
+
       {step === 4 && (
-        <ReviewStep 
+        <ReviewStep
           formData={formData}
-          onSubmit={handleSubmit}
+          onSubmit={() => handleSubmit()}
           onPrevious={goToPreviousStep}
         />
       )}
-      
+
       {step === 5 && (
         <SuccessStep />
       )}

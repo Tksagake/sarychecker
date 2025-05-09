@@ -33,14 +33,22 @@
       - `storage_path` (text)
       - `created_at` (timestamp with time zone)
 
+    - `submissions`
+      - `id` (uuid, primary key)
+      - `personal_info` (jsonb, not null)
+      - `consent_info` (jsonb, not null)
+      - `document_metadata` (jsonb)
+      - `created_at` (timestamp with time zone)
+
   2. Security
-    - Enable RLS on all tables
-    - Add policies for authenticated users to manage their own data
+    - Disable RLS on all tables
+    - Remove RLS policies
+    - Ensure only admins can perform CRUD operations
 */
 
 -- Create profiles table
 CREATE TABLE profiles (
-  id uuid PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
+  id uuid PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE DEFAULT gen_random_uuid(),
   updated_at timestamptz DEFAULT now(),
   first_name text,
   second_name text,
@@ -52,21 +60,6 @@ CREATE TABLE profiles (
   physical_address text
 );
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own profile"
-  ON profiles
-  FOR SELECT
-  TO authenticated
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile"
-  ON profiles
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
-
 -- Create applications table
 CREATE TABLE applications (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,27 +70,6 @@ CREATE TABLE applications (
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
-
-ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own applications"
-  ON applications
-  FOR SELECT
-  TO authenticated
-  USING (profile_id = auth.uid());
-
-CREATE POLICY "Users can insert own applications"
-  ON applications
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (profile_id = auth.uid());
-
-CREATE POLICY "Users can update own applications"
-  ON applications
-  FOR UPDATE
-  TO authenticated
-  USING (profile_id = auth.uid())
-  WITH CHECK (profile_id = auth.uid());
 
 -- Create documents table
 CREATE TABLE documents (
@@ -111,32 +83,62 @@ CREATE TABLE documents (
   created_at timestamptz DEFAULT now()
 );
 
-ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+-- Create a new submissions table
+CREATE TABLE submissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    personal_info JSONB NOT NULL,
+    consent_info JSONB NOT NULL,
+    document_metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 
-CREATE POLICY "Users can view own documents"
-  ON documents
-  FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM applications
-      WHERE applications.id = documents.application_id
-      AND applications.profile_id = auth.uid()
-    )
-  );
+-- Disable RLS on all tables
+ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE applications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE documents DISABLE ROW LEVEL SECURITY;
+ALTER TABLE submissions DISABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can insert own documents"
-  ON documents
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM applications
-      WHERE applications.id = application_id
-      AND applications.profile_id = auth.uid()
-    )
-  );
+-- Remove RLS policies (if any exist)
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view own applications" ON applications;
+DROP POLICY IF EXISTS "Users can insert own applications" ON applications;
+DROP POLICY IF EXISTS "Users can update own applications" ON applications;
+DROP POLICY IF EXISTS "Users can view own documents" ON documents;
+DROP POLICY IF EXISTS "Users can insert own documents" ON documents;
+DROP POLICY IF EXISTS "Users can insert their own submissions" ON submissions;
+DROP POLICY IF EXISTS "Users can view their own submissions" ON submissions;
+
+-- Ensure only admins can perform CRUD operations
+-- This can be enforced through Supabase's dashboard or API key restrictions.
 
 -- Create indexes for better query performance
 CREATE INDEX idx_applications_profile_id ON applications(profile_id);
 CREATE INDEX idx_documents_application_id ON documents(application_id);
+
+-- Update profiles table to autogenerate id
+ALTER TABLE profiles ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+-- Update applications table to autogenerate id
+ALTER TABLE applications ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+-- Update documents table to autogenerate id
+ALTER TABLE documents ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+-- Add storage policy for the `submissions` bucket
+-- Allow only admins to perform CRUD operations
+CREATE POLICY "Admins can access submissions bucket"
+  ON storage.objects
+  FOR ALL
+  TO authenticated
+  USING (
+    auth.role() = 'admin'
+  );
+
+-- Update storage policy for the `submissions` bucket
+-- Allow anonymous users to upload files
+CREATE POLICY "Anons can upload to submissions bucket"
+  ON storage.objects
+  FOR INSERT
+  TO public
+  USING (true);

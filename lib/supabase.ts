@@ -5,11 +5,11 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export async function insertFormData(table: string, data: any) {
-  const { data: result, error } = await supabase.from(table).insert(data);
-  if (error) {
+export async function insertFormData(table: string, data: Record<string, any>): Promise<Record<string, any>[]> {
+  const { data: result, error } = await supabase.from(table).insert(data).select();
+  if (error || !result) {
     console.error('Error inserting data into Supabase:', error);
-    throw error;
+    throw new Error('Failed to insert data into Supabase');
   }
   return result;
 }

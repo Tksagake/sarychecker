@@ -92,7 +92,7 @@ export function DocumentUploadStep({
       
       <CardFooter className="flex justify-between pt-6">
         <Button 
-          variant="outline" 
+          
           onClick={onPrevious}
           disabled={isLoading}
         >
@@ -101,7 +101,7 @@ export function DocumentUploadStep({
         <Button 
           onClick={handleNext}
           disabled={isLoading}
-          isLoading={isLoading}
+          
         >
           Continue to Consent
         </Button>
