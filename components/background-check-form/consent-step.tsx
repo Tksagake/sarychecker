@@ -112,7 +112,7 @@ export function ConsentStep({
           Previous
         </Button>
         <Button onClick={handleNext}>
-          Continue to Review
+          Continue
         </Button>
       </CardFooter>
     </Card>

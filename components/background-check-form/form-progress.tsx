@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { CheckIcon, UserIcon, FileIcon, ShieldIcon, FileCheckIcon } from 'lucide-react';
+import { CheckIcon, UserIcon, FileIcon, ShieldIcon, FileCheckIcon, DollarSignIcon } from 'lucide-react';
 
 interface FormProgressProps {
   currentStep: number;
@@ -11,8 +11,9 @@ export function FormProgress({ currentStep }: FormProgressProps) {
   const steps = [
     { id: 1, name: 'Personal Information', icon: UserIcon },
     { id: 2, name: 'Documents', icon: FileIcon },
-    { id: 3, name: 'Consent', icon: ShieldIcon },
-    { id: 4, name: 'Review', icon: FileCheckIcon },
+    { id: 3, name: 'Payment', icon: DollarSignIcon },
+    { id: 4, name: 'Consent', icon: ShieldIcon },
+    { id: 5, name: 'Review', icon: FileCheckIcon },
   ];
 
   return (
