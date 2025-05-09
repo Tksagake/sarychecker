@@ -90,7 +90,7 @@ export function PaymentStep({ onNext, onPrevious, updateFormData }: PaymentStepP
                 Previous
               </Button>
               <Button type="submit" disabled={isProcessing}>
-                {isProcessing ? 'Processing...' : 'Proceed to Review'}
+                {isProcessing ? 'Processing...' : 'Proceed'}
               </Button>
             </div>
           </form>

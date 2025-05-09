@@ -11,8 +11,8 @@ export function FormProgress({ currentStep }: FormProgressProps) {
   const steps = [
     { id: 1, name: 'Personal Information', icon: UserIcon },
     { id: 2, name: 'Documents', icon: FileIcon },
-    { id: 3, name: 'Payment', icon: DollarSignIcon },
-    { id: 4, name: 'Consent', icon: ShieldIcon },
+    { id: 3, name: 'Consent', icon: ShieldIcon },
+    { id: 4, name: 'Payment', icon: DollarSignIcon },
     { id: 5, name: 'Review', icon: FileCheckIcon },
   ];
 

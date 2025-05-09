@@ -211,20 +211,22 @@ export function FormContainer() {
         />
       )}
 
-      {step === 3 && (
-        <PaymentStep
-          onNext={goToNextStep}
-          onPrevious={goToPreviousStep}
-          updateFormData={(field, value) => updateFormData(field, value, 'paymentInfo')}
-        />
-      )}
 
-      {step === 4 && (
+      {step === 3 && (
         <ConsentStep
           formData={formData.consentInfo}
           updateFormData={(field, value) => updateFormData(field, value, 'consentInfo')}
           onNext={goToNextStep}
           onPrevious={goToPreviousStep}
+        />
+      )}
+
+      
+      {step === 4 && (
+        <PaymentStep
+          onNext={goToNextStep}
+          onPrevious={goToPreviousStep}
+          updateFormData={(field, value) => updateFormData(field, value, 'paymentInfo')}
         />
       )}
 
