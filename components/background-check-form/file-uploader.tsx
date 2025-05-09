@@ -26,7 +26,6 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
     const selectedFiles = Array.from(event.target.files || []);
     processFiles(selectedFiles);
     
-    // Reset the file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -50,7 +49,6 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
   };
 
   const processFiles = (selectedFiles: File[]) => {
-    // Validate file types and sizes
     const invalidFiles = selectedFiles.filter(
       file => !ALLOWED_FILE_TYPES.includes(file.type) || file.size > MAX_FILE_SIZE
     );
@@ -68,7 +66,6 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
     );
 
     if (validFiles.length > 0) {
-      // Add the new files to the existing ones
       const newFiles = files ? [...files, ...validFiles] : validFiles;
       onChange(newFiles);
     }
@@ -82,23 +79,10 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
     }
   };
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes('image')) {
-      return 'image';
-    } else if (fileType.includes('pdf')) {
-      return 'pdf';
-    }
-    return 'file';
-  };
-
   const formatFileSize = (sizeInBytes: number) => {
-    if (sizeInBytes < 1024) {
-      return `${sizeInBytes} B`;
-    } else if (sizeInBytes < 1024 * 1024) {
-      return `${(sizeInBytes / 1024).toFixed(1)} KB`;
-    } else {
-      return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`;
-    }
+    if (sizeInBytes < 1024) return `${sizeInBytes} B`;
+    if (sizeInBytes < 1024 * 1024) return `${(sizeInBytes / 1024).toFixed(1)} KB`;
+    return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -131,8 +115,8 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
             onChange={handleFileChange}
           />
           <Button
-            variant="outline"
-            size="sm"
+            
+            
             onClick={() => fileInputRef.current?.click()}
             className="mt-2"
           >
@@ -153,8 +137,7 @@ export function FileUploader({ label, description, files, onChange }: FileUpload
                 </div>
               </div>
               <Button
-                variant="ghost"
-                size="icon"
+                
                 className="h-7 w-7 rounded-full"
                 onClick={() => removeFile(index)}
               >
