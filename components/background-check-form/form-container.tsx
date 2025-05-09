@@ -69,7 +69,7 @@ export function FormContainer() {
     setFormData((prev) => ({
       ...prev,
       [section]: {
-        ...(typeof prev[section] === 'object' && prev[section] !== null ? prev[section] : {}),
+        ...((prev[section] as Record<string, any>) || {}),
         [fieldName]: value,
       },
     }));
