@@ -12,7 +12,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center space-x-2">
           
           <Image
-            src="https://sary.co/static/media/logo.0c4f2a3b.svg"
+            src="/logo.png"
             alt="Sary Logo"
             width={40}
             height={40}
